@@ -1,19 +1,13 @@
-# Proffy <br>
+# Funcionalidades
 
-NEXT LEVEL WEEK #2
+## Conexões
 
-## Languages
+- Rota para listar o total de conexões realizadas;
+- Rota para criar uma nova conexão;
 
-[X] - [Typescript](https://www.typescriptlang.org).
+## Aulas
 
-## Libraries
+- Rota para criar uma aula;
+- Rota para listar aulas;
+ - Filtrar por matéria, dia da semana e horário;
 
-[X] - [REACT](https://pt-br.reactjs.org). <br>
-[X] - [REACT-DOM](https://pt-br.reactjs.org/docs/react-dom.html). <br>
-
-## Techs
-
-[X] - [Create React App](https://github.com/facebook/create-react-app). <br>
-[X] - [Eslint](https://eslint.org). <br>
-[X] - [Prettier](https://prettier.io). <br>
-[X] - [EditorConfig](https://editorconfig.org). <br>
