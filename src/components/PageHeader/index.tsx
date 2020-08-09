@@ -8,9 +8,10 @@ import './styles.css'
 
 interface PageHeaderProps {
   title: string
+  description?: string
 }
 
-const PageHeader: React.FunctionComponent<PageHeaderProps> = (props) => {
+const PageHeader: React.FunctionComponent<PageHeaderProps> = ({title, description, children}) => {
   return (
     <header className="page-header">
       <div className="top-bar-container">
@@ -21,8 +22,10 @@ const PageHeader: React.FunctionComponent<PageHeaderProps> = (props) => {
         </div>
 
       <div className="header-content">
-        <strong>{props.title}</strong>
-        {props.children}
+        <strong>{title}</strong>
+        { description && <p>{ description }</p> }
+
+        {children}
       </div>
     </header>
   )
