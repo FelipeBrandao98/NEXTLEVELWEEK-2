@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { View, Text, Image } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { RectButton } from 'react-native-gesture-handler'
+
+import styles from './styles'
 
 import api from '../../services/api'
 
-import logoImg from '../../assets/images/logo.svg'
-import landingImg from '../../assets/images/landing.svg'
-import studyIcon from '../../assets/images/icons/study.svg'
-import giveClassesIcon from '../../assets/images/icons/give-classes.svg'
-import purpleHeartIcon from '../../assets/images/icons/purple-heart.svg'
+import LandingImg from '../../assets/images/landing.png'
+import StudyIcon from '../../assets/images/icons/study.png'
+import GiveClassesIcon from '../../assets/images/icons/give-classes.png'
+import HeartIcon from '../../assets/images/icons/heart.png'
 
-import './styles.css'
-
-const Landing: React.FunctionComponent = () => {
+function Landing() {
+  const { navigate } = useNavigation()
   const [totalConnections, setTotalConnections] = useState(0)
 
   useEffect(() => {
@@ -22,37 +24,44 @@ const Landing: React.FunctionComponent = () => {
     })
   }, [])
 
+  function handleNavigateToGiveClassesPage() {
+    navigate('GiveClasses')
+  }
+
+  function handleNavigateToStudyPages() {
+    navigate('Study')
+  }
+
   return (
-    <div id="page-landing">
-      <div id="page-landing-content">
-        <div className="logo-container">
-          <img src={logoImg} alt="Proffy"/>
-          <h2>Sua plataforma de estudos online.</h2>
-        </div>
+    <View style={styles.container}>
+      <Image source={LandingImg} style={styles.banner} />
+      <Text style={styles.title}>
+        Seja bem-vindo, {'\n'}
+        <Text style={styles.titleBold} >O que deseja fazer?</Text>
+      </Text>
 
-        <img
-          src={landingImg}
-          alt="Plataforma de estudos"
-          className="hero-image"
-        />
+      <View style={styles.buttonsContainer}>
+        <RectButton
+          onPress={handleNavigateToStudyPages}
+          style={[styles.button, styles.buttonPrimary]}
+        >
+          <Image source={StudyIcon}/>
+          <Text style={styles.buttonText}>Estudar</Text>
+        </RectButton>
+        <RectButton
+          onPress={handleNavigateToGiveClassesPage}
+          style={[styles.button, styles.buttonSecondary]}
+         >
+          <Image source={GiveClassesIcon}/>
+          <Text style={styles.buttonText}>Dar Aulas</Text>
+        </RectButton>
+      </View>
 
-        <div className="buttons-container">
-          <Link to="/study" className="study">
-            <img src={studyIcon} alt="Estudar"/>
-            Estudar
-          </Link>
-
-          <Link to="/give-classes" className="give-classes">
-            <img src={giveClassesIcon} alt="Dar Aula"/>
-            Dar Aulas
-          </Link>
-        </div>
-
-        <span className="total-connections">
-          Total de {totalConnections} conexões já realizadas <img src={purpleHeartIcon} alt="Coração roxo"/>
-        </span>
-      </div>
-    </div>
+      <Text style={styles.totalConnections}>
+        Total de {totalConnections} conexões já realizadas {' '}
+        <Image source={HeartIcon} />
+      </Text>
+    </View>  
   )
 }
 

@@ -1,34 +1,41 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { ReactNode } from 'react';
+import { View, Image, Text } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { BorderlessButton } from 'react-native-gesture-handler'
 
-import logoImg from '../../assets/images/logo.svg'
-import backIcon from '../../assets/images/icons/back.svg'
+import BackIcon from '../../assets/images/icons/back.png'
+import LogoImg from '../../assets/images/logo.png'
 
-import './styles.css'
+import styles from './styles'
 
 interface PageHeaderProps {
   title: string
-  description?: string
+  headerRight?: ReactNode
 }
 
-const PageHeader: React.FunctionComponent<PageHeaderProps> = ({title, description, children}) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, headerRight ,children }) => {
+  const { navigate } = useNavigation()
+
+  function handleGoBack() {
+    navigate('Landing')
+  }
+
   return (
-    <header className="page-header">
-      <div className="top-bar-container">
-        <Link to="/" >
-          <img src={backIcon} alt="Voltar"/>
-        </Link>
-        <img src={logoImg} alt="Proffy"/>
-        </div>
+    <View style={styles.container}>
+      <View style={styles.topBar}>
+        <BorderlessButton onPress={handleGoBack}>
+          <Image source={BackIcon} resizeMode="contain"/>
+        </BorderlessButton>
 
-      <div className="header-content">
-        <strong>{title}</strong>
-        { description && <p>{ description }</p> }
-
-        {children}
-      </div>
-    </header>
+        <Image source={LogoImg} resizeMode="contain"/>
+      </View>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        {headerRight}
+      </View>
+      {children}
+    </View>
   )
 }
 
-export default PageHeader
+export default PageHeader;

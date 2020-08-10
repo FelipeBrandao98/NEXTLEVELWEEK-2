@@ -1,23 +1,50 @@
-import React, { useState, FormEvent } from 'react'
+import React, { useState, useEffect } from 'react'
+import { View, Text } from 'react-native'
+import { ScrollView, TextInput, BorderlessButton, RectButton } from 'react-native-gesture-handler'
+import { Feather } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-community/async-storage'
+
+import styles from './styles'
 
 import PageHeader from '../../components/PageHeader'
 import TeacherItem, { Teacher } from '../../components/TeacherItem'
-import Input from '../../components/Input'
-import Select from '../../components/Select'
-
 import api from '../../services/api'
+import { useFocusEffect } from '@react-navigation/native'
 
-import './styles.css'
+const TeacherList: React.FC = () => {
+  const [isFiltersVisible, setIsFiltersVisible] = useState(true)
+  const [favorites, setFavorites] = useState<number[]>([])
 
-const TeacherList: React.FunctionComponent = () => {
   const [teachers, setTeachers] = useState([])
 
   const [subject, setSubject] = useState('')
   const [week_day, setWeek_day] = useState('')
   const [time, setTime] = useState('')
 
-  async function searchTeachers(e: FormEvent) {
-    e.preventDefault()
+  function handleToggleFiltersVisible() {
+    setIsFiltersVisible(!isFiltersVisible)
+  }
+
+  function loadFavorites() {
+    AsyncStorage.getItem('favorites').then(response => {
+      if (response) {
+        const favoritedTeachers = JSON.parse(response)
+        const favoritedTeachersIds = favoritedTeachers.map((teacher: Teacher) => {
+          return teacher.id
+        })
+
+        setFavorites(favoritedTeachersIds)
+      }
+    })
+  }
+
+  useFocusEffect(() => {
+    loadFavorites()
+  })
+
+
+  async function handleFiltersSubmit() {
+    loadFavorites()
 
     const response = await api.get('classes', {
       params: {
@@ -27,68 +54,74 @@ const TeacherList: React.FunctionComponent = () => {
       }
     })
 
-    console.log(response.data)
+    setIsFiltersVisible(false)
     setTeachers(response.data)
   }
 
   return (
-    <div id="page-teacher-list" className="container">
-      <PageHeader title="Estes são os Proffys disponíveis">
-        <form id="search-teachers" onSubmit={searchTeachers}>
-        <Select
-            name="subject"
-            label="Matéria"
-            value={subject}
-            onChange={e => { setSubject(e.target.value) }}
-            options={[
-              { value: 'Artes', label: 'Artes' },
-              { value: 'Biologia', label: 'Biologia' },
-              { value: 'Ciências', label: 'Artes' },
-              { value: 'Educação física', label: 'Educação física' },
-              { value: 'Física', label: 'Física' },
-              { value: 'Geografia', label: 'Geografia' },
-              { value: 'História', label: 'História' },
-              { value: 'Matemática', label: 'Matemática' },
-              { value: 'Português', label: 'Português' },
-              { value: 'Química', label: 'Química' },
-            ]}
-          />
-          <Select
-            name="week_day"
-            label="Dia da semana"
-            value={week_day}
-            onChange={e => { setWeek_day(e.target.value) }}
-            options={[
-              { value: '0', label: 'Domingo' },
-              { value: '1', label: 'Segunda-feira' },
-              { value: '2', label: 'Terça-feira' },
-              { value: '3', label: 'Quarta-feira' },
-              { value: '4', label: 'Quinta-feira' },
-              { value: '5', label: 'Sexta-feira' },
-              { value: '6', label: 'Sábado' },
-            ]}
-          />
-          <Input
-            type="time"
-            name="time"
-            label="Hora"
-            value={time}
-            onChange={e => { setTime(e.target.value) }}
-          />
+    <View style={styles.container}>
+      <PageHeader
+      title="Proffys Disponíveis."
+      headerRight={(
+        <BorderlessButton onPress={handleToggleFiltersVisible}>
+          <Feather name="filter" size={28} color="#FFF" />
+        </BorderlessButton>
+      )}
+      >
+        { isFiltersVisible && (<View style={styles.searchForm}>
+            <Text style={styles.label}>Matéria</Text>
+            <TextInput
+              value={subject}
+              onChangeText={text => setSubject(text)}
+              style={styles.input}
+              placeholder="Qual a matéria"
+            />
 
-          <button type="submit">
-            Buscar
-          </button>
-        </form>
+            <View style={styles.inputGroup}>
+              <View style={styles.inputBlock}>
+                <Text style={styles.label}>Dia da semana</Text>
+                <TextInput
+                  value={week_day}
+                  onChangeText={text => setWeek_day(text)}
+                  style={styles.input}
+                  placeholder="Qual o dia?"
+                />
+              </View>
+              <View style={styles.inputBlock}>
+                <Text style={styles.label}>Horário</Text>
+                <TextInput
+                value={time}
+                onChangeText={text => setTime(text)}
+                  style={styles.input}
+                  placeholder="Qual horário?"
+                />
+              </View>
+            </View>
+            <RectButton onPress={handleFiltersSubmit} style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>Filtrar</Text>
+            </RectButton>
+          </View>
+        )}
       </PageHeader>
-
-      <main>
+      <ScrollView
+        style={styles.teacherList}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingBottom: 24,
+        }}
+      >
         {teachers.map((teacher: Teacher) => {
-          return <TeacherItem key={teacher.id} teacher={teacher} />
+          return (
+            <TeacherItem
+              key={teacher.id}
+              teacher={teacher}
+              favorited={favorites.includes(teacher.id)}
+            />
+          )
         })}
-      </main>
-    </div>
+      </ScrollView>
+    </View>
   )
 }
 
-export default TeacherList
+export default TeacherList;
